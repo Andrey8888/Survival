@@ -7,20 +7,17 @@ public class DragObject : MonoBehaviour
 {
     bool MouseOn = false;
     private Transform curObj;
-    // Use this for initialization
     float mass;
     void Start()
     {
 
     }
 	void OnMouseDown()
-    {
-       
+    { 
         MouseOn = true;
     }
     void OnMouseUp()
     {
-        
         MouseOn = false;
     }
     // Update is called once per frame
