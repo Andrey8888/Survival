@@ -2,10 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ObjectConstruction : MonoBehaviour
 {
-    [SerializeField] private enum Materials
+    public enum Materials
     {
         Wood,
         Metal,
@@ -13,24 +14,86 @@ public class ObjectConstruction : MonoBehaviour
         Stone,
         Explosive
     }
-    public int Lives = 6;
+    public Materials materials;
+
+    public int currentHealth;
+    public int startHealth;
+    public int globalCount = 0;
+    [Title("HealthBar stuff")]
+    public Image healthBar;
+    public Image healthBarBG;
+    public float highObj;
+    public Canvas canvas;
+
     [Title("Scratched Object")]
     public Sprite scratchedSprite;
     [Title("Broken Object")]
     public Sprite brokenSprite;
+
+    private Quaternion InitRot;
+    private Vector3 InitPos;
+
     void Start()
     {
-        Lives = 6;
+        ApplyingMaterials();
+        healthBar.gameObject.SetActive(false);
+        healthBarBG.gameObject.SetActive(false);
+        InitRot = canvas.transform.localRotation;
+        currentHealth = startHealth;
     }
     public void Update()
     {
-        if (Lives <= 4)
+        healthBar.fillAmount = currentHealth * 100f / (startHealth * 100f);
+        if (currentHealth <= 4)
         gameObject.GetComponent<SpriteRenderer>().sprite = scratchedSprite;
-        if (Lives <= 2)
+        if (currentHealth <= 2)
         gameObject.GetComponent<SpriteRenderer>().sprite = brokenSprite;
+        if (currentHealth <= 0)
+        {
+            Destroy(gameObject, 0.1f);
+        }
+    }
+    private void LateUpdate()
+    {
+        canvas.transform.rotation = InitRot;
+        canvas.transform.position = new Vector3(transform.position.x  , transform.position.y + highObj , 0);
     }
     public void Damage(int damage)
     {
-        Lives = Lives - damage;
+        currentHealth = currentHealth - damage;
+        healthBar.gameObject.SetActive(true);
+        healthBarBG.gameObject.SetActive(true);
+        StartCoroutine(ShowHealth());
+    }
+    public void ApplyingMaterials()
+    {
+        if (materials == Materials.Wood)
+        {
+            startHealth = 6;
+        }
+        if (materials == Materials.Glass)
+        {
+            startHealth = 4;
+        }
+        if (materials == Materials.Stone)
+        {
+            startHealth = 8;
+        }
+        if (materials == Materials.Metal)
+        {
+            startHealth = 10;
+        }
+        if (materials == Materials.Explosive)
+        {
+            startHealth = 10;
+        }
+
+    }
+    IEnumerator ShowHealth()
+    {
+        yield return new WaitForSeconds(4f);
+        healthBar.gameObject.SetActive(false);
+        healthBarBG.gameObject.SetActive(false);
     }
 }
+

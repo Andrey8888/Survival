@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LightingEvent : MonoBehaviour
 {
-    [SerializeField] private Lighting lighting;
+    public Lighting lighting;
     IEnumerator LightingCoroutine()
     {
         while (true)

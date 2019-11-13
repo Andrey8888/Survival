@@ -1,7 +1,8 @@
-﻿using System.Collections;
+﻿using Sirenix.OdinInspector;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class Player : MonoBehaviour {
 
     public float speed;
@@ -18,13 +19,21 @@ public class Player : MonoBehaviour {
     private Rigidbody2D rb2d;
     private Animator anim;
 
-    public int Lives = 3;
+    public float currentHealth;
+    private float startHealth  = 6;
+
+    [Title("HealthBar stuff")]
+    public Image healthBar;
+    public Image healthBarBG;
+    public Canvas canvas;
 
     private float groundAngle = 0;
     private Transform curObj;
 
     public void Awake()
     {
+        healthBar.gameObject.SetActive(false);
+        healthBarBG.gameObject.SetActive(false);
         isSpawn = true;
         isParashuteOff = true;
         isGrounded = true;
@@ -49,6 +58,8 @@ public class Player : MonoBehaviour {
         {
             createobject.Spawn();
             isSpawn = false;
+            healthBar.gameObject.SetActive(true);
+            healthBarBG.gameObject.SetActive(true);
         }
     }
 void Update()
@@ -58,6 +69,7 @@ void Update()
         //    isParashuteOff = true;
         //    Application.LoadLevel(0);
         //}
+        healthBar.fillAmount = currentHealth * 100f / (startHealth * 100f);
         if (isGrounded == true ||  Input.GetKeyDown(KeyCode.Space))
         {
             curObj.GetComponent<Rigidbody2D>().gravityScale = 1;
@@ -66,7 +78,6 @@ void Update()
     }
     public void Damage(int damage)
     {
-        Lives = Lives - damage;
+        currentHealth = currentHealth - damage;
     }
-
 }

@@ -11,7 +11,7 @@ public class WavesEvent : MonoBehaviour
         while (true)
         {
             Instantiate(wavePref, new Vector2(wavePos.position.x, wavePos.position.y), Quaternion.identity);
-            yield return new WaitForSeconds(8);
+            yield return new WaitForSeconds(10);
         }
     }
 

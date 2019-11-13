@@ -85,6 +85,10 @@ public class SceneController : MonoBehaviour
             create.StartCount = 1;
             player.isSpawn = true;
         }
+        if (int.Parse(scoreText.text) == 1 && !isPrepare)
+        {
+            create.UnFreez();
+        }
         if (int.Parse(scoreText.text) == 0 && !isPrepare)
         {
             level++;
@@ -97,46 +101,11 @@ public class SceneController : MonoBehaviour
 
             cataclysmsText.gameObject.SetActive(true);
             cataclysmsText2.gameObject.SetActive(true);
-            if (countCataclysm >= 1)
-            {
-                if (listCataclysms[Type] == Сataclysms.EarthShake.ToString())
-                {
-                    Island.GetComponent<EarthShake>().isActive = true;
-                    scoreText.color = Color.yellow;
-                    cataclysmsText.color = Color.yellow;
-                    cataclysmsText.text = listCataclysms[Type];
-                }
-                if (listCataclysms[Type] == Сataclysms.Lighting.ToString())
-                {
-                    GetComponent<LightingEvent>().StartCoroutine("LightingCoroutine");
-                    scoreText.color = Color.cyan;
-                    cataclysmsText.color = Color.cyan;
-                    cataclysmsText.text = listCataclysms[Type];
-                }
-                if (listCataclysms[Type] == Сataclysms.MeteorRain.ToString())
-                {
-                    GetComponent<MeteorRainEvent>().StartCoroutine("MeteorCoroutine");
-                    scoreText.color = Color.red;
-                    cataclysmsText.color = Color.red;
-                    cataclysmsText.text = listCataclysms[Type];
-                }
-                if (listCataclysms[Type] == Сataclysms.Waves.ToString())
-                {
-                    GetComponent<WavesEvent>().StartCoroutine("WaveCoroutine");
-                    scoreText.color = Color.blue;
-                    cataclysmsText.color = Color.blue;
-                    cataclysmsText.text = listCataclysms[Type];
-                }
-                if (listCataclysms[Type] == Сataclysms.WhirlWind.ToString())
-                {
-                    GetComponent<WhirlWindEvent>().StartCoroutine("WindCoroutine");
-                    scoreText.color = Color.gray;
-                    cataclysmsText.color = Color.gray;
-                    cataclysmsText.text = listCataclysms[Type];
-                }
-                cataclysmsText2.gameObject.SetActive(false);
-            }
-            if (countCataclysm == 2)
+
+            SingleCataclysm(Type);
+            cataclysmsText2.gameObject.SetActive(false);
+
+            if (level > 5)
             {
                 cataclysmsText2.gameObject.SetActive(true);
                 int Type2 = Random.Range(0, listCataclysms.Count);
@@ -144,39 +113,81 @@ public class SceneController : MonoBehaviour
                 {
                     Type2 = Random.Range(0, listCataclysms.Count);
                 }
-                while(Type == Type2);
-                if (listCataclysms[Type2] == Сataclysms.EarthShake.ToString())
-                {
-                    Island.GetComponent<EarthShake>().isActive = true;
-                    cataclysmsText2.color = Color.yellow;
-                    cataclysmsText2.text = $"+ {listCataclysms[Type2]}";
-                }
-                if (listCataclysms[Type2] == Сataclysms.Lighting.ToString())
-                {
-                    GetComponent<LightingEvent>().StartCoroutine("LightingCoroutine");
-                    cataclysmsText2.color = Color.cyan;
-                    cataclysmsText2.text = $"+ {listCataclysms[Type2]}";
-                }
-                if (listCataclysms[Type2] == Сataclysms.MeteorRain.ToString())
-                {
-                    GetComponent<MeteorRainEvent>().StartCoroutine("MeteorCoroutine");
-                    cataclysmsText2.color = Color.red;
-                    cataclysmsText2.text = $"+ {listCataclysms[Type2]}";
-                }
-                if (listCataclysms[Type2] == Сataclysms.Waves.ToString())
-                {
-                    GetComponent<WavesEvent>().StartCoroutine("WaveCoroutine");
-                    cataclysmsText2.color = Color.blue;
-                    cataclysmsText2.text = $"+ {listCataclysms[Type2]}";
-                }
-                if (listCataclysms[Type2] == Сataclysms.WhirlWind.ToString())
-                {
-                    GetComponent<WhirlWindEvent>().StartCoroutine("WindCoroutine");
-                    cataclysmsText2.color = Color.gray;
-                    cataclysmsText2.text = $"+ {listCataclysms[Type2]}";
-                }
+                while (Type == Type2);
+                SeveralCataclysm(Type2);
             }
             isPrepare = true;
+        }
+    }
+    private void SingleCataclysm(int Type)
+    {
+        if (listCataclysms[Type] == Сataclysms.EarthShake.ToString())
+        {
+            Island.GetComponent<EarthShake>().isActive = true;
+            scoreText.color = Color.yellow;
+            cataclysmsText.color = Color.yellow;
+            cataclysmsText.text = listCataclysms[Type];
+        }
+        if (listCataclysms[Type] == Сataclysms.Lighting.ToString())
+        {
+            GetComponent<LightingEvent>().StartCoroutine("LightingCoroutine");
+            scoreText.color = Color.cyan;
+            cataclysmsText.color = Color.cyan;
+            cataclysmsText.text = listCataclysms[Type];
+        }
+        if (listCataclysms[Type] == Сataclysms.MeteorRain.ToString())
+        {
+            GetComponent<MeteorRainEvent>().StartCoroutine("MeteorCoroutine");
+            scoreText.color = Color.red;
+            cataclysmsText.color = Color.red;
+            cataclysmsText.text = listCataclysms[Type];
+        }
+        if (listCataclysms[Type] == Сataclysms.Waves.ToString())
+        {
+            GetComponent<WavesEvent>().StartCoroutine("WaveCoroutine");
+            scoreText.color = Color.blue;
+            cataclysmsText.color = Color.blue;
+            cataclysmsText.text = listCataclysms[Type];
+        }
+        if (listCataclysms[Type] == Сataclysms.WhirlWind.ToString())
+        {
+            GetComponent<WhirlWindEvent>().StartCoroutine("WindCoroutine");
+            scoreText.color = Color.gray;
+            cataclysmsText.color = Color.gray;
+            cataclysmsText.text = listCataclysms[Type];
+        }
+    }
+    private void SeveralCataclysm(int Type2)
+    {
+        if (listCataclysms[Type2] == Сataclysms.EarthShake.ToString())
+        {
+            Island.GetComponent<EarthShake>().isActive = true;
+            cataclysmsText2.color = Color.yellow;
+            cataclysmsText2.text = $"+ {listCataclysms[Type2]}";
+        }
+        if (listCataclysms[Type2] == Сataclysms.Lighting.ToString())
+        {
+            GetComponent<LightingEvent>().StartCoroutine("LightingCoroutine");
+            cataclysmsText2.color = Color.cyan;
+            cataclysmsText2.text = $"+ {listCataclysms[Type2]}";
+        }
+        if (listCataclysms[Type2] == Сataclysms.MeteorRain.ToString())
+        {
+            GetComponent<MeteorRainEvent>().StartCoroutine("MeteorCoroutine");
+            cataclysmsText2.color = Color.red;
+            cataclysmsText2.text = $"+ {listCataclysms[Type2]}";
+        }
+        if (listCataclysms[Type2] == Сataclysms.Waves.ToString())
+        {
+            GetComponent<WavesEvent>().StartCoroutine("WaveCoroutine");
+            cataclysmsText2.color = Color.blue;
+            cataclysmsText2.text = $"+ {listCataclysms[Type2]}";
+        }
+        if (listCataclysms[Type2] == Сataclysms.WhirlWind.ToString())
+        {
+            GetComponent<WhirlWindEvent>().StartCoroutine("WindCoroutine");
+            cataclysmsText2.color = Color.gray;
+            cataclysmsText2.text = $"+ {listCataclysms[Type2]}";
         }
     }
     private void StopCorouine()

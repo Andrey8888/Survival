@@ -8,7 +8,7 @@ public class EarthShake : MonoBehaviour
     public bool isActive;
     private GameObject Up;
     private GameObject Down;
-    public float speed;
+
     private void Start()
     {
         i = true;
@@ -16,14 +16,14 @@ public class EarthShake : MonoBehaviour
         Down = GameObject.FindGameObjectWithTag("Down");
     }
     // Update is called once per frame
-    private void Update()
+    private void FixedUpdate()
     {
+        float rnd = Random.Range(-0.03f, 0.03f);
         if (isActive)
         {
-            float rnd = Random.Range(1f, speed);
             if (i == true)
             {
-                transform.localPosition = Vector3.MoveTowards(transform.position, Up.transform.position, rnd * Time.deltaTime);
+                transform.localPosition = Vector3.MoveTowards(new Vector2 (transform.position.x + rnd, transform.position.y + rnd), Up.transform.position, Time.fixedDeltaTime);
                 if (transform.position == Up.transform.position)
                 {
                     i = false;
@@ -31,27 +31,12 @@ public class EarthShake : MonoBehaviour
             }
             if (i == false)
             {
-                transform.localPosition = Vector3.MoveTowards(transform.position, Down.transform.position, rnd * Time.deltaTime);
+                transform.localPosition = Vector3.MoveTowards(transform.position, Down.transform.position, Time.fixedDeltaTime);
                 if (transform.position == Down.transform.position)
                 {
                     i = true;
                 }
             }
-        }
-    }
-    void OnCollisionEnter2D(Collision2D collider)
-    {
-        if ((collider.gameObject.tag == "Box") || (collider.gameObject.tag == "Player"))
-        {
-            collider.transform.parent = transform;
-        }
-    }
-
-    void OnCollisionExit2D(Collision2D collider)
-    {
-        if ((collider.gameObject.tag == "Box") || (collider.gameObject.tag == "Player"))
-        {
-            collider.transform.parent = null;
         }
     }
 }

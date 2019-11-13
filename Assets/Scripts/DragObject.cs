@@ -5,14 +5,16 @@ using System.Collections.Generic;
 
 public class DragObject : MonoBehaviour
 {
-    bool MouseOn = false;
-    private Transform curObj;
+    public bool MouseOn;
+    public Transform curObj;
+    [SerializeField] private CreateObject create;
     float mass;
-    void Start()
+    private void Start()
     {
-
+        create = FindObjectOfType<CreateObject>();
+        MouseOn = false;
     }
-	void OnMouseDown()
+    void OnMouseDown()
     { 
         MouseOn = true;
     }
@@ -20,18 +22,13 @@ public class DragObject : MonoBehaviour
     {
         MouseOn = false;
     }
-    // Update is called once per frame
     void Update() {
-
-
         if (Input.GetKey(KeyCode.Q) && (MouseOn))
         {
-            Debug.Log("prees Q");
             this.transform.rotation *= Quaternion.Euler( 0f , 0f, 100f * Time.deltaTime);
         }
         if (Input.GetKey(KeyCode.E) && (MouseOn))
         {
-            Debug.Log("prees Q");
             this.transform.rotation *= Quaternion.Euler(0f, 0f, -100f * Time.deltaTime);
         }
         Vector3 Cursor = Input.mousePosition;
@@ -40,6 +37,7 @@ public class DragObject : MonoBehaviour
         if (MouseOn)
         {
             this.transform.position = Cursor;
+            gameObject.GetComponent<Rigidbody2D>().isKinematic = false;
             curObj = transform;
             mass = curObj.GetComponent<Rigidbody2D>().mass; // запоминаем массу объекта
             //curObj.GetComponent<Rigidbody2D>().mass = 0.0000001f; // убираем массу, чтобы не сбивать другие объекты
@@ -59,7 +57,6 @@ public class DragObject : MonoBehaviour
             curObj.GetComponent<Rigidbody2D>().gravityScale = 1;
         }
     }
-
     //private void OnTriggerStay2D(Collider2D col)
     //{
     //    OnTrigger = true;
