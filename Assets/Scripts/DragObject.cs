@@ -9,6 +9,8 @@ public class DragObject : MonoBehaviour
     public Transform curObj;
     [SerializeField] private CreateObject create;
     float mass;
+    private bool OnTrigger;
+
     private void Start()
     {
         create = FindObjectOfType<CreateObject>();
@@ -49,19 +51,26 @@ public class DragObject : MonoBehaviour
         }
         if (!MouseOn)
         {
+
             curObj = transform;
             curObj.GetComponent<Rigidbody2D>().freezeRotation = false;
             curObj.GetComponent<Rigidbody2D>().simulated = true;
             //curObj.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
             //curObj.GetComponent<Rigidbody2D>().mass = mass;
             curObj.GetComponent<Rigidbody2D>().gravityScale = 1;
+
+            //if (create.IsFreez == true)
+            //{
+            //    create.IsFreez = false;
+            //    GetComponent<DragObject>().enabled = false;
+            //}
         }
     }
     //private void OnTriggerStay2D(Collider2D col)
     //{
     //    OnTrigger = true;
     //}
-    //private void InTriggerStay2D(Collider2D col)
+    //private void OnTriggerExit2D(Collider2D col)
     //{
     //    OnTrigger = false;
     //}

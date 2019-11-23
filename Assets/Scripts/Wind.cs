@@ -9,7 +9,11 @@ public class Wind : MonoBehaviour
     private Rigidbody2D componentRigidbody;
     private Vector3 pos;
     private float direction;
-
+    private GameObject windEndPos;
+    private void Start()
+    {
+        windEndPos = GameObject.FindGameObjectWithTag("WindEnd");
+    }
     void Awake()
     {
         pos = gameObject.transform.position;
@@ -20,7 +24,7 @@ public class Wind : MonoBehaviour
     void FixedUpdate()
     {
         transform.Translate(Vector3.left * speed * direction * Time.fixedDeltaTime);
-        if (transform.position.x < (pos.x - 6))
+        if (transform.position.x < (windEndPos.transform.position.x))
 
         {
             direction = -1;

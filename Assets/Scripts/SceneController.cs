@@ -25,13 +25,17 @@ public class SceneController : MonoBehaviour
 
     [SerializeField] private Player player;
 
+    public bool IsWaves;
+
     private int level = 0;
     private bool isPrepare;
+    private bool isSpacePressed;
 
     private List<string> listCataclysms = new List<string>();
 
     [Title("Change Сataclysms")]
     [SerializeField] private Сataclysms cataclysms;
+
 
     [System.Flags]
     [SerializeField]
@@ -53,8 +57,11 @@ public class SceneController : MonoBehaviour
     private void Start()    
     {
         level = 0;
+        levelText.text = "Level:" + level.ToString();
+
         InvokeRepeating("RunTimer", 1, 1);
         isPrepare = false;
+        isSpacePressed = true;
 
         var currnetcolor = scoreText.color;
 
@@ -68,12 +75,27 @@ public class SceneController : MonoBehaviour
     }
     void Update()
     {
-        if (int.Parse(scoreText.text) == 0 && isPrepare)
+            if (player.isGrounded == true && Input.GetKeyDown(KeyCode.Space) && isSpacePressed)
+            {
+                scoreText.text = "3";
+                isSpacePressed = false;
+            }
+
+        if (int.Parse(scoreText.text) == 1 && isPrepare)
         {
+            create.StartCoroutine("Defrosting");
+        }
+            if (int.Parse(scoreText.text) == 0 && isPrepare)
+        {
+ 
+            create.StartCount = 1;
+            create.StartCoroutine("Spawn");
+
             cataclysmsText.text = "Prepare";
             scoreText.color = Color.white;
             cataclysmsText.color = Color.white;
 
+            isSpacePressed = true;
             scoreText.text = "10";
 
             cataclysmsText.gameObject.SetActive(false);
@@ -81,16 +103,11 @@ public class SceneController : MonoBehaviour
             isPrepare = false;
 
             StopCorouine();
-
-            create.StartCount = 1;
-            player.isSpawn = true;
-        }
-        if (int.Parse(scoreText.text) == 1 && !isPrepare)
-        {
-            create.UnFreez();
+            IsWaves = false;
         }
         if (int.Parse(scoreText.text) == 0 && !isPrepare)
         {
+            create.StartCoroutine("Freezing");
             level++;
             Island.GetComponent<EarthShake>().isActive = false;
             scoreText.text = "20";
@@ -145,6 +162,7 @@ public class SceneController : MonoBehaviour
         if (listCataclysms[Type] == Сataclysms.Waves.ToString())
         {
             GetComponent<WavesEvent>().StartCoroutine("WaveCoroutine");
+            IsWaves = true;
             scoreText.color = Color.blue;
             cataclysmsText.color = Color.blue;
             cataclysmsText.text = listCataclysms[Type];
@@ -180,6 +198,7 @@ public class SceneController : MonoBehaviour
         if (listCataclysms[Type2] == Сataclysms.Waves.ToString())
         {
             GetComponent<WavesEvent>().StartCoroutine("WaveCoroutine");
+            IsWaves = true;
             cataclysmsText2.color = Color.blue;
             cataclysmsText2.text = $"+ {listCataclysms[Type2]}";
         }

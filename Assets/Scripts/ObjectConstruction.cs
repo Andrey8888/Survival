@@ -55,7 +55,7 @@ public class ObjectConstruction : MonoBehaviour
     }
     private void LateUpdate()
     {
-        canvas.transform.rotation = InitRot;
+        canvas.transform.rotation = Quaternion.Euler(InitRot.x, InitRot.y , InitRot.z);
         canvas.transform.position = new Vector3(transform.position.x  , transform.position.y + highObj , 0);
     }
     public void Damage(int damage)
@@ -67,13 +67,13 @@ public class ObjectConstruction : MonoBehaviour
     }
     public void ApplyingMaterials()
     {
+                if (materials == Materials.Glass)
+        {
+            startHealth = 4;
+        }
         if (materials == Materials.Wood)
         {
             startHealth = 6;
-        }
-        if (materials == Materials.Glass)
-        {
-            startHealth = 4;
         }
         if (materials == Materials.Stone)
         {

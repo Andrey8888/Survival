@@ -6,7 +6,7 @@ using UnityEngine;
 public class CreateObject : MonoBehaviour
 {
     public List<GameObject> objetcCount;
-    public int StartCount = 6;
+    public int StartCount = 7;
     public GameObject player;
 
     public GameObject SpawnPoint;
@@ -17,31 +17,56 @@ public class CreateObject : MonoBehaviour
         objetcCount = new List<GameObject>();
         objetcCount.Add(player);
     }
-    public void Spawn()
+    IEnumerator Spawn()
     {
         var p = SpawnPoint.transform.position;
-        for (int i = 0; i < StartCount; i++)
+        for (int i = 0; i < StartCount; )
         {
             int Type = Random.Range(0, SetItems.Length);
             float xx = Random.Range(-4, 4);
-            float yy = Random.Range(0, 5);
-            //Debug.DrawLine(new Vector2(p.x + xx, p.y + yy), new Vector2(p.x + xx, p.y + yy));
-            while (Physics2D.OverlapArea(new Vector2(p.x + xx, p.y + yy), new Vector2(p.x + xx, p.y + yy), layermask) == null)
+            float yy = Random.Range(2, 5);
+            if (Physics2D.OverlapArea(new Vector2(p.x + xx, p.y + yy), new Vector2(p.x + xx - 2f, p.y + yy + 2f), layermask) == null)
             {
                 GameObject construction = Instantiate(SetItems[Type], new Vector3(p.x + xx, p.y + yy, p.z), Quaternion.identity);
-                construction.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 300));
                 construction.GetComponent<Rigidbody2D>().isKinematic = true;
+                construction.GetComponent<DragObject>().enabled = true;
                 objetcCount.Add(construction);
+                i++;           
             }
+            yield return new WaitForSeconds(0);
         }
     }
-    public void UnFreez()
+    IEnumerator Freezing()
     {
         foreach (var item in objetcCount)
         {
-            if(item.GetComponent<DragObject>().MouseOn != true)
-                item.GetComponent<DragObject>().enabled = false;
-            item.GetComponent<Rigidbody2D>().isKinematic = false;
+            if (item != null)
+            {
+                if (item.GetComponent<DragObject>() != null)
+                {
+                    if (item.GetComponent<DragObject>().MouseOn != true)
+                    {
+                        item.GetComponent<Rigidbody2D>().isKinematic = false;
+                        item.GetComponent<DragObject>().enabled = false;
+                    }
+                    item.GetComponent<Rigidbody2D>().isKinematic = false;
+                }
+            }
         }
+        yield return new WaitForSeconds(0);
+    }
+    IEnumerator Defrosting()
+    {
+        foreach (var item in objetcCount)
+        {
+            if (item != null)
+            {
+                if (item.GetComponent<DragObject>() != null)
+                {
+                    item.GetComponent<DragObject>().enabled = true;
+                }
+            }
+        }
+        yield return new WaitForSeconds(0);
     }
 }

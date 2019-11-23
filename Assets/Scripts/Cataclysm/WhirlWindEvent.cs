@@ -16,7 +16,7 @@ public class WhirlWindEvent : MonoBehaviour
         {
             //int rnd = Random.Range(0, windPos.Length);
             Instantiate(windPref, new Vector2(windPos.transform.position.x, windPos.transform.position.y), Quaternion.identity);
-            yield return new WaitForSeconds(10);
+            yield return new WaitForSeconds(30);
         }
     }
 }

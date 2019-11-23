@@ -56,10 +56,8 @@ public class Player : MonoBehaviour {
         }
         if (isGrounded == true && isSpawn == true)
         {
-            createobject.Spawn();
+            createobject.StartCoroutine("Spawn");
             isSpawn = false;
-            healthBar.gameObject.SetActive(true);
-            healthBarBG.gameObject.SetActive(true);
         }
     }
 void Update()
@@ -79,5 +77,12 @@ void Update()
     public void Damage(int damage)
     {
         currentHealth = currentHealth - damage;
+        StartCoroutine(ShowHealth());
+    }
+    IEnumerator ShowHealth()
+    {
+        yield return new WaitForSeconds(4f);
+        healthBar.gameObject.SetActive(false);
+        healthBarBG.gameObject.SetActive(false);
     }
 }
