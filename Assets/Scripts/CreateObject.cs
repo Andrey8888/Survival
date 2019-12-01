@@ -6,34 +6,38 @@ using UnityEngine;
 public class CreateObject : MonoBehaviour
 {
     public List<GameObject> objetcCount;
-    public int StartCount = 7;
-    public GameObject player;
+    public int StartCount = 6;
+    //public GameObject player;
 
     public GameObject SpawnPoint;
     public GameObject[] SetItems;
     public LayerMask layermask;
+
     public void Start()
     {
         objetcCount = new List<GameObject>();
-        objetcCount.Add(player);
+        //objetcCount.Add(player);
     }
+
     IEnumerator Spawn()
     {
-        var p = SpawnPoint.transform.position;
-        for (int i = 0; i < StartCount; )
+        var pos = SpawnPoint.transform.position;
+        for (int i = 0; i < StartCount;)
         {
-            int Type = Random.Range(0, SetItems.Length);
-            float xx = Random.Range(-4, 4);
-            float yy = Random.Range(2, 5);
-            if (Physics2D.OverlapArea(new Vector2(p.x + xx, p.y + yy), new Vector2(p.x + xx - 2f, p.y + yy + 2f), layermask) == null)
-            {
-                GameObject construction = Instantiate(SetItems[Type], new Vector3(p.x + xx, p.y + yy, p.z), Quaternion.identity);
-                construction.GetComponent<Rigidbody2D>().isKinematic = true;
-                construction.GetComponent<DragObject>().enabled = true;
-                objetcCount.Add(construction);
-                i++;           
-            }
-            yield return new WaitForSeconds(0);
+                int type = Random.Range(0, SetItems.Length);
+                float spawnPosX = Random.Range(-3, 6);
+                float spawnPosY = Random.Range(2, 6);
+                Vector3 spawnPos = new Vector3(pos.x + spawnPosX, pos.y + spawnPosY, 0);
+                Vector3 spawnPos2 = new Vector3(pos.x + spawnPosX -2f , pos.y + spawnPosY - 2f, 0);
+                while (!Physics2D.OverlapArea(spawnPos, spawnPos2, layermask))
+                {
+                    GameObject construction = Instantiate(SetItems[type], (spawnPos + spawnPos2)/2, Quaternion.identity);
+                    construction.GetComponent<Rigidbody2D>().isKinematic = true;
+                    construction.GetComponent<DragObject>().enabled = true;
+                    objetcCount.Add(construction);
+                    i++;
+                }
+                yield return new WaitForSeconds(0);
         }
     }
     IEnumerator Freezing()

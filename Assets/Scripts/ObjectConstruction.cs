@@ -19,6 +19,12 @@ public class ObjectConstruction : MonoBehaviour
     public int currentHealth;
     public int startHealth;
     public int globalCount = 0;
+
+    public Material noAlpha;
+    private Material standart;
+    private HashSet<GameObject> electrifiedObjects;
+    private Rigidbody2D rb2d;
+
     [Title("HealthBar stuff")]
     public Image healthBar;
     public Image healthBarBG;
@@ -32,6 +38,15 @@ public class ObjectConstruction : MonoBehaviour
 
     private Quaternion InitRot;
     private Vector3 InitPos;
+    public bool IsElectrified;
+    public bool IsElectrifiedPlayer;
+
+    private Player player;
+    private SceneController controller;
+    private float Speed;
+
+    private float startDelayFallingDamage = 1f;
+    private float delayFallingDamage = 1f;
 
     void Start()
     {
@@ -40,34 +55,62 @@ public class ObjectConstruction : MonoBehaviour
         healthBarBG.gameObject.SetActive(false);
         InitRot = canvas.transform.localRotation;
         currentHealth = startHealth;
+
+        standart = GetComponent<SpriteRenderer>().material;
+        GetComponent<SpriteRenderer>().material = noAlpha;
+
+        IsElectrified = false;
+        IsElectrifiedPlayer = false;
+
+        electrifiedObjects = new HashSet<GameObject>();
+        player = FindObjectOfType<Player>();
+        controller = FindObjectOfType<SceneController>();
+        rb2d = GetComponent<Rigidbody2D>();
+
+        delayFallingDamage = startDelayFallingDamage;
     }
     public void Update()
     {
+        Speed = rb2d.velocity.magnitude;
+
         healthBar.fillAmount = currentHealth * 100f / (startHealth * 100f);
         if (currentHealth <= 4)
-        gameObject.GetComponent<SpriteRenderer>().sprite = scratchedSprite;
+            gameObject.GetComponent<SpriteRenderer>().sprite = scratchedSprite;
         if (currentHealth <= 2)
-        gameObject.GetComponent<SpriteRenderer>().sprite = brokenSprite;
+            gameObject.GetComponent<SpriteRenderer>().sprite = brokenSprite;
         if (currentHealth <= 0)
         {
             Destroy(gameObject, 0.1f);
         }
+
+        delayFallingDamage -= Time.deltaTime;
+    }
+    void RefreshDelay()
+    {
+        this.delayFallingDamage = this.startDelayFallingDamage;
     }
     private void LateUpdate()
     {
-        canvas.transform.rotation = Quaternion.Euler(InitRot.x, InitRot.y , InitRot.z);
-        canvas.transform.position = new Vector3(transform.position.x  , transform.position.y + highObj , 0);
+        canvas.transform.rotation = Quaternion.Euler(InitRot.x, InitRot.y, InitRot.z);
+        canvas.transform.position = new Vector3(transform.position.x, transform.position.y + highObj, 0);
     }
     public void Damage(int damage)
     {
+        IsElectrified = false;
         currentHealth = currentHealth - damage;
         healthBar.gameObject.SetActive(true);
         healthBarBG.gameObject.SetActive(true);
         StartCoroutine(ShowHealth());
+
+        if (this.materials == Materials.Metal)
+        {
+            StartCoroutine(ShowLight());
+        }
+        GetComponent<SpriteRenderer>().material = standart;
     }
     public void ApplyingMaterials()
     {
-                if (materials == Materials.Glass)
+        if (materials == Materials.Glass)
         {
             startHealth = 4;
         }
@@ -94,6 +137,103 @@ public class ObjectConstruction : MonoBehaviour
         yield return new WaitForSeconds(4f);
         healthBar.gameObject.SetActive(false);
         healthBarBG.gameObject.SetActive(false);
+    }
+    IEnumerator ShowLight()
+    {
+        yield return new WaitForSeconds(1f);
+        GetComponent<SpriteRenderer>().material = noAlpha;
+    }
+
+    //void OnCollisionEnter2D(Collision2D collision)
+    //{
+
+    //    float power = collision.relativeVelocity.magnitude;
+    //    if (power >= dangerPower)
+    //    {
+    //        state.SetPower(power);
+    //    }
+    //}
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if ((collision.gameObject.tag == "Box") || (collision.gameObject.tag == "Player"))
+        {
+            if (collision)
+            {
+                if (!electrifiedObjects.Contains(collision.gameObject))
+                {
+                    if ((collision.GetComponent<ObjectConstruction>() != null) && collision.GetComponent<ObjectConstruction>().materials == Materials.Metal)
+                    {
+                        electrifiedObjects.Add(collision.gameObject);
+                    }
+                }
+                //col.gameObject.GetComponent<ObjectConstruction>().IsElectrified = true;
+            }
+        }
+    }
+    void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Box")
+        {
+            if (collision)
+            {
+                if (!electrifiedObjects.Contains(collision.gameObject))
+                {
+                    electrifiedObjects.Add(collision.gameObject);
+                }
+                //col.gameObject.GetComponent<ObjectConstruction>().IsElectrified = true;
+            }
+        }
+    }
+    void OnTriggerStay2D(Collider2D collision)
+    {
+        if (!controller.isSpacePressed)
+        {
+            if (collision.gameObject.tag == "Box" || collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Player")
+            {
+                if (Speed > 3)
+                {
+                    if (delayFallingDamage > 0) return;
+                    {
+                        RefreshDelay();
+                        Debug.Log(Speed);
+                        int damageFalling = (int)Speed / 3;
+                        if (collision.GetComponent<ObjectConstruction>() != null)
+                        {
+                            Debug.Log("Сила удара " + collision.gameObject.name + " : " + damageFalling);
+                            collision.GetComponent<ObjectConstruction>().Damage(damageFalling);
+                        }
+                        if (collision.GetComponent<Player>() != null)
+                        {
+                            Debug.Log("Сила удара " + collision.gameObject.name + " : " + damageFalling);
+                            collision.gameObject.GetComponent<Player>().Damage(damageFalling);
+                        }
+                        Damage(damageFalling);
+                        Debug.Log("Собственая сила удара " + this.gameObject.name + " : " + damageFalling);
+                    }
+                }
+            }
+        }
+
+
+        if ((collision.gameObject.tag == "Box") && (IsElectrified == true) )
+        {
+            IsElectrified = false;
+            foreach (var item in electrifiedObjects)
+            {
+                if(item != null)
+                    { 
+                    if (item.GetComponent<ObjectConstruction>() != null)
+                        item.GetComponent<ObjectConstruction>().Damage(1);
+                    }
+            }
+        }
+        if ((collision.gameObject.tag == "Player") && (IsElectrifiedPlayer == true))
+        {
+            IsElectrifiedPlayer = false;
+            Debug.Log(collision.gameObject.name + ": ударило молнией");
+            player.gameObject.GetComponent<Player>().Damage(1);
+            player.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 500));
+        }
     }
 }
 

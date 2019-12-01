@@ -6,11 +6,15 @@ using UnityEngine;
 public class Lighting : MonoBehaviour
 {
     [SerializeField] public CreateObject create;
+    [SerializeField] public ObjectConstruction objConstr;
     [SerializeField] private GameObject lighting;
+
+    public SpriteOutlineFx outline;
     public bool IsLight;
     public void Start()
     {
         IsLight = false;
+        outline = FindObjectOfType<SpriteOutlineFx>();
     }
     public void LightingStart()
     {
@@ -48,13 +52,18 @@ public class Lighting : MonoBehaviour
                     //    obj.GetComponent<ObjectConstruction>().Damage(0);
                     //}
                     //else
+                    outline.sampleDistance = 4.8f;
                     if (create.objetcCount[rnd].gameObject.GetComponent<Player>() == true)
                     {
                         create.objetcCount[rnd].gameObject.GetComponent<Player>().Damage(2);
                         create.objetcCount[rnd].GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 500));
                     }
                     else
+                    {
                         create.objetcCount[rnd].GetComponent<ObjectConstruction>().Damage(4);
+                        create.objetcCount[rnd].gameObject.GetComponent<ObjectConstruction>().IsElectrified = true;
+                        create.objetcCount[rnd].gameObject.GetComponent<ObjectConstruction>().IsElectrifiedPlayer = true;
+                    }
                     Destroy(LightObj, 0.8f);
                     IsLight = true;
                 }

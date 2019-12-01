@@ -29,7 +29,7 @@ public class SceneController : MonoBehaviour
 
     private int level = 0;
     private bool isPrepare;
-    private bool isSpacePressed;
+    public bool isSpacePressed;
 
     private List<string> listCataclysms = new List<string>();
 
